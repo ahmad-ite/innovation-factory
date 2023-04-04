@@ -5,6 +5,7 @@
 /public/storage
 /storage/*.key
 /vendor
+/zzz_extra
 .env
 .env.backup
 .env.production
