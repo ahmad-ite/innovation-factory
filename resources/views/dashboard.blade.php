@@ -4,11 +4,11 @@
             <h2 class="text-xl font-semibold leading-tight">
                 {{ __('Dashboard') }}
             </h2>
-            <x-button target="_blank" href="https://github.com/kamona-wd/kui-laravel-fortify" variant="black"
+            <!-- <x-button target="_blank" href="https://github.com/kamona-wd/kui-laravel-fortify" variant="black"
                 class="items-center justify-center max-w-xs gap-2">
                 <x-icons.github class="w-6 h-6" aria-hidden="true" />
                 <span>{{ __('Star on Github') }}</span>
-            </x-button>
+            </x-button> -->
         </div>
     </x-slot>
 
