@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,4 +22,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
     Route::view('/profile', 'profile.show')->name('profile.show');
+
+    Route::resource('users', UserController::class);
 });
