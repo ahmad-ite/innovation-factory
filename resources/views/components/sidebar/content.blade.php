@@ -9,16 +9,18 @@
 
     <x-sidebar.link title="{{ __('Users') }}" href="{{ route('users.index') }}"
         :isActive="request()->routeIs('users.index')">
-        <x-slot name="icon">
+        <i class="nav-icon fas fa-users-cog"></i>
+        <!-- <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
-        </x-slot>
+        </x-slot> -->
     </x-sidebar.link>
 
     <x-sidebar.link title="{{ __('Deleted Users') }}" href="{{ route('users.trashed') }}"
         :isActive="request()->routeIs('users.trashed')">
-        <x-slot name="icon">
+        <i class="nav-icon fas fa-users-cog"></i>
+        <!-- <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
-        </x-slot>
+        </x-slot> -->
     </x-sidebar.link>
 
     <!-- <x-sidebar.link title="{{ __('Template') }}" href="https://www.github.com/kamona-ui" target="_blank">
