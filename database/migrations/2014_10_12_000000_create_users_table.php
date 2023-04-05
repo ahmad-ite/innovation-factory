@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\User\UserPrefixnameEnum;
+use App\Enums\User\UserTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +15,9 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('prefixname')->nullable();
+
+            $table->enum('prefixname', UserPrefixnameEnum::getValues())
+                ->default(null);
             $table->string('firstname');
             $table->string('middlename')->nullable();
             $table->string('lastname');
@@ -23,6 +27,8 @@ return new class extends Migration
             $table->text('password');
             $table->text('photo')->nullable();
             $table->string('type')->default('user');
+            $table->enum('product_type', UserTypeEnum::getValues())
+            ->default(UserTypeEnum::USER->value);
             $table->rememberToken();
             $table->timestamp('email_verified_at')->nullable();
 
@@ -31,7 +37,6 @@ return new class extends Migration
 
             $table->index('email');
             $table->index('type');
-
         });
     }
 

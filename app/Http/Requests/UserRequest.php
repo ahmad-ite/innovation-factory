@@ -27,17 +27,5 @@ class UserRequest extends FormRequest
         return $this->container->make(
             UserServiceInterface::class
         )->rules($this->user);
-        return
-        [
-			'prefixname' => 'required',
-			'firstname' => 'required',
-			'middlename' => 'required',
-			'lastname' => 'required',
-			'suffixname' => 'required',
-			'username' => 'required',
-			'email' => 'required',
-			'password' => 'required',
-			'photo' => 'required',
-        ];
     }
 }

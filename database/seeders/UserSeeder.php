@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Enums\User\UserPrefixnameEnum;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
         User::firstOrCreate([
             'email' => config('default.admin.email'),
         ], [
-            'prefixname' => 'Mr',
+            'prefixname' => UserPrefixnameEnum::MR->value,
             'firstname' => 'Admin',
             // 'middlename' => null,
             'lastname' => 'Sys',
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
             'username' => 'admin',
             // 'photo' => null,
             'email_verified_at' => now(),
-            'password' => Hash::make(config('default.admin.password')),
+            'password' => config('default.admin.password'),
             'remember_token' => Str::random(10),
         ]);
 

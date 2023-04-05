@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Enums\User\UserPrefixnameEnum;
+use App\Enums\User\UserTypeEnum;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserService implements UserServiceInterface
@@ -50,24 +52,24 @@ class UserService implements UserServiceInterface
              *
              * 'column' => ['validation1', function1()]
              */
-            'prefixname' => 'string.required',
+            // 'prefixname' => 'string.required',
+            'prefixname' => [UserPrefixnameEnum::getValuesAsInRule()],
             'firstname' => 'string|required',
-            'middlename' => 'string|required',
+            'middlename' => 'string',
             'lastname' => 'string|required',
-            'suffixname' => 'string|required',
-            'username' => 'string|required',
-            'email' => 'email|required',
+            'suffixname' => 'string',
+            'username' => 'string|required|unique:users,'.$id,
+            'type' => [UserTypeEnum::getValuesAsInRule(), 'required'],
+            'email' => 'string|required|unique:users,email_address,'.$id,
             'password' => 'required',
-            'photo' => 'required',
+            // 'photo' => '',
         ];
     }
 
     /**
      * Retrieve all resources and paginate.
-     *
-     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function list():LengthAwarePaginator
+    public function list(): LengthAwarePaginator
     {
         // dd($this->model->latest()->paginate(config('default.pagination.size')));
         return $this->model->latest()->paginate(config('default.pagination.size'));
@@ -89,7 +91,7 @@ class UserService implements UserServiceInterface
      */
     public function find(int $id): ?Model
     {
-        // Code goes brrrr.
+        return $this->model->find($id);
     }
 
     /**

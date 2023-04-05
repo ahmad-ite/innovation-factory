@@ -3,15 +3,18 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use SoftDeletes,HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -56,5 +59,46 @@ class User extends Authenticatable
     protected static function newFactory()
     {
         return UserFactory::new();
+    }
+
+    /**
+     * Retrieve the default photo from storage.
+     * Supply a base64 png image if the `photo` column is null.
+     */
+    public function getAvatarAttribute(): string
+    {
+        return $this->photo ?? config('default.avatar');
+    }
+
+    /**
+     * Retrieve the user's full name in the format:
+     *  [firstname][ mi?][ lastname]
+     * Where:
+     *  [ mi?] is the optional middle initial.
+     */
+    public function getFullnameAttribute(): string
+    {
+        return $this->middlename ? $this->firstname.' '.$this->middlename.' '.$this->lastname
+            : $this->firstname.' '.$this->lastname;
+    }
+
+    /**
+     * Retrieve the user's Middleinitial from middlename
+     * E.g. "delos Santos" -> "D."
+     */
+    public function getMiddleinitialAttribute(): string
+    {
+        return $this->middlename ? ucfirst($this->middlename[0]).'.'
+        : '';
+    }
+
+    /**
+     * hash password before saving
+     */
+    protected function password(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => Hash::make($value),
+        );
     }
 }

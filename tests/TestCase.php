@@ -18,6 +18,6 @@ abstract class TestCase extends BaseTestCase
         $this->refreshDatabase();
 
         // seed the database
-        $this->seed();
+        // $this->seed();
     }
 }
