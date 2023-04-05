@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Events\UserSaved;
+use App\Traits\UrlHelper;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +16,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use SoftDeletes,HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use SoftDeletes,HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable,UrlHelper;
 
     /**
      * The attributes that are mass assignable.
@@ -67,7 +69,7 @@ class User extends Authenticatable
      */
     public function getAvatarAttribute(): string
     {
-        return $this->photo ?? config('default.avatar');
+        return $this->photo ? $this->url($this->photo) : $this->url(config('default.avatar'));
     }
 
     /**
@@ -98,7 +100,25 @@ class User extends Authenticatable
     protected function password(): Attribute
     {
         return Attribute::make(
-            set: fn ($value) => Hash::make($value),
+            set: fn ($value) => $this->id ? $value : Hash::make($value),
         );
     }
+
+    public function details(): HasMany
+    {
+        return $this->hasMany(Detail::class, 'user_id', 'id');
+    }
+
+    public function save(array $options = [])
+    {
+        parent::save($options);
+
+        event(new UserSaved($this));
+    }
+
+    // public static function boot()
+    // {
+    //     parent::boot();
+    //     self::observe(UserObserver::class);
+    // }
 }
