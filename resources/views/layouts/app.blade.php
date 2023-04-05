@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'K UI') }}</title>
-
+    <title>{{ config('app.name', 'Test') }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap"
@@ -15,14 +15,16 @@
 
     <!-- Styles -->
     <style>
-        [x-cloak] {
-            display: none;
-        }
+    [x-cloak] {
+        display: none;
+    }
     </style>
     <link rel="stylesheet" href="{{ mix('css/app.css') }}">
 
     <!-- Scripts -->
     <script src="{{ mix('js/app.js') }}" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
+
 </head>
 
 <body class="font-sans antialiased">
@@ -31,13 +33,10 @@
             <!-- Sidebar -->
             <x-sidebar.sidebar />
             <!-- Page Wrapper -->
-            <div class="flex flex-col min-h-screen" 
-                :class="{ 
+            <div class="flex flex-col min-h-screen" :class="{
                     'lg:ml-64': isSidebarOpen,
                     'md:ml-16': !isSidebarOpen
-                }" 
-                style="transition-property: margin; transition-duration: 150ms;"
-            >
+                }" style="transition-property: margin; transition-duration: 150ms;">
 
                 <!-- Navbar -->
                 <x-navbar />
@@ -51,7 +50,8 @@
 
                 <!-- Page Content -->
                 <main class="px-4 sm:px-6 flex-1">
-                    {{ $slot }}
+                    <!-- @yield('content') -->
+                    {{ $slot}}
                 </main>
 
                 <!-- Page Footer -->
