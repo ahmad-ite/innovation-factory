@@ -26,8 +26,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->text('password');
             $table->text('photo')->nullable();
-            $table->string('type')->default('user');
-            $table->enum('product_type', UserTypeEnum::getValues())
+            $table->enum('type', UserTypeEnum::getValues())
             ->default(UserTypeEnum::USER->value);
             $table->rememberToken();
             $table->timestamp('email_verified_at')->nullable();

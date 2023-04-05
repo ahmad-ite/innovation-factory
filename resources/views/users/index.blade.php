@@ -20,15 +20,21 @@
         <table class="table table-bordered">
             <tr>
                 <th>No</th>
-                <th>Name</th>
+                <th>Fullname</th>
                 <th>Email</th>
+                <th>Username</th>
+                <th>Photo</th>
                 <th width="280px">Action</th>
             </tr>
             @foreach ($users as $key=>$user)
             <tr>
                 <td>{{ ++$i}}</td>
-                <td>{{ $user->name }}</td>
+                <td>{{ $user->fullname }}</td>
                 <td>{{ $user->email }}</td>
+                <td>{{ $user->username }}</td>
+                <td>
+                    <img src="{{ $user->avatar}}" style=" height: 100px; width: 150px;">
+                </td>
                 <td>
 
                     <form class="delete" action="{{ route('users.destroy',$user->id) }}" method="POST">
@@ -39,10 +45,9 @@
 
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-xs btn-danger btn-flat show_confirm" data-toggle="tooltip"
-                            title='Delete'>Delete11</button>
+                        <button type="submit" class="btn btn-danger" title='Delete'>Delete</button>
 
-                        <!-- <button type="submit" class="btn btn-danger show_confirm">Delete</button> -->
+
                     </form>
                 </td>
             </tr>
@@ -54,32 +59,3 @@
 
 
 </x-app-layout>
-
-<script type="text/javascript">
-$(".delete").on("submit", function() {
-    return confirm("Are you sure?");
-});
-var form = document.getElementById("form-id");
-document.getElementById("your-id").addEventListener("click", function() {
-    // form.submit();
-    alert(33);
-});
-$('.show_confirm').click(function(event) {
-    alert(111);
-    var form = $(this).closest("form");
-    var name = $(this).data("email");
-    event.preventDefault();
-    swal({
-            title: `Are you sure you want to delete this record?`,
-            text: "If you delete this, it will be gone forever.",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        })
-        .then((willDelete) => {
-            if (willDelete) {
-                form.submit();
-            }
-        });
-});
-</script>

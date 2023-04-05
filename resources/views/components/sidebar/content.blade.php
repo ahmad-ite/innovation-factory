@@ -14,6 +14,13 @@
         </x-slot>
     </x-sidebar.link>
 
+    <x-sidebar.link title="{{ __('Deleted Users') }}" href="{{ route('users.trashed') }}"
+        :isActive="request()->routeIs('users.trashed')">
+        <x-slot name="icon">
+            <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+        </x-slot>
+    </x-sidebar.link>
+
     <!-- <x-sidebar.link title="{{ __('Template') }}" href="https://www.github.com/kamona-ui" target="_blank">
         <x-slot name="icon">
             <x-heroicon-o-template class="flex-shrink-0 w-6 h-6" aria-hidden="true" />

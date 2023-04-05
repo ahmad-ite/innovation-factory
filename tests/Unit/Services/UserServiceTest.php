@@ -4,6 +4,7 @@ namespace Tests\Unit\Services;
 
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Foundation\Testing\WithoutEvents;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 use Tests\Traits\AssertHelper;
@@ -15,7 +16,7 @@ use Tests\Traits\AssertHelper;
  */
 class UserServiceTest extends TestCase
 {
-    use  AssertHelper;
+    use  AssertHelper; //, WithoutEvents;
 
     protected $userService = null;
 
@@ -174,5 +175,16 @@ class UserServiceTest extends TestCase
         // Actions
 
         // Assertions
+    }
+
+    public function it_can_handle_saving_details_users()
+    {
+        // Create a new user and save it to the database
+        $user = User::factory()->create();
+
+        //call handleSavingDetails  service
+        $this->assertEquals($this->userService->handleSavingDetails($user), true);
+
+        dd($user);
     }
 }

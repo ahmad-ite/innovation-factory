@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Database\Eloquent\Model;
+
 interface UserServiceInterface
 {
     /**
@@ -9,7 +11,21 @@ interface UserServiceInterface
      *
      * @return string
      */
-    public function hash(string $key);
+
 
     public function list();
+
+    public function store(array $attributes);
+
+    public function find(int $id): ?Model;
+
+    public function update(int $id, array $attributes): bool;
+
+    public function destroy($id);
+
+    public function listTrashed();
+
+    public function restore($id);
+
+    public function delete($id);
 }

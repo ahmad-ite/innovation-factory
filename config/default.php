@@ -9,5 +9,5 @@ return [
     'pagination' => [
         'size' => 5,
     ],
-    'avatar' => 'default_avatr',
+    'avatar' => 'users/images/default.png',
 ];

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
-use App\Models\User;
 use App\Services\UserServiceInterface;
 use Illuminate\View\View;
 
@@ -24,6 +23,7 @@ class UserController extends Controller
     public function index(): View
     {
         $users = $this->user->list();
+
         return view('users.index', compact('users'))
            ->with('i', (request()->input('page', 1) - 1) * config('default.pagination.size'));
     }
@@ -45,17 +45,7 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $user = new User;
-        $user->prefixname = $request->input('prefixname');
-        $user->firstname = $request->input('firstname');
-        $user->middlename = $request->input('middlename');
-        $user->lastname = $request->input('lastname');
-        $user->suffixname = $request->input('suffixname');
-        $user->username = $request->input('username');
-        $user->email = $request->input('email');
-        $user->password = $request->input('password');
-        $user->photo = $request->input('photo');
-        $user->save();
+        $this->user->store($request->all());
 
         return redirect()->route('users.index');
     }
@@ -68,7 +58,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::findOrFail($id);
+        // dd($id);
+        $user = $this->user->find($id);
 
         return view('users.show', ['user' => $user]);
     }
@@ -81,7 +72,7 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = User::findOrFail($id);
+        $user = $this->user->find($id);
 
         return view('users.edit', ['user' => $user]);
     }
@@ -94,17 +85,7 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, $id)
     {
-        $user = User::findOrFail($id);
-        $user->prefixname = $request->input('prefixname');
-        $user->firstname = $request->input('firstname');
-        $user->middlename = $request->input('middlename');
-        $user->lastname = $request->input('lastname');
-        $user->suffixname = $request->input('suffixname');
-        $user->username = $request->input('username');
-        $user->email = $request->input('email');
-        $user->password = $request->input('password');
-        $user->photo = $request->input('photo');
-        $user->save();
+        $this->user->update($id, $request->all());
 
         return redirect()->route('users.index');
     }
@@ -117,9 +98,35 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
+        $this->user->destroy($id);
 
         return redirect()->route('users.index');
+    }
+
+    /**
+     * Display a trashed listing of the users.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function trashed(): View
+    {
+        $users = $this->user->listTrashed();
+
+        return view('trashed_users.index', compact('users'))
+           ->with('i', (request()->input('page', 1) - 1) * config('default.pagination.size'));
+    }
+
+    public function restore($id)
+    {
+        $this->user->restore($id);
+
+        return redirect()->route('users.index');
+    }
+
+    public function delete($id)
+    {
+        $this->user->delete($id);
+
+        return redirect()->route('users.trashed');
     }
 }

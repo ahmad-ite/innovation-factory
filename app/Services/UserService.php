@@ -2,13 +2,19 @@
 
 namespace App\Services;
 
+use App\Enums\Detail\DetailKeysEnum;
+use App\Enums\Detail\DetailTypeEnum;
 use App\Enums\User\UserPrefixnameEnum;
 use App\Enums\User\UserTypeEnum;
+use App\Models\Detail;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class UserService implements UserServiceInterface
 {
@@ -44,25 +50,32 @@ class UserService implements UserServiceInterface
     public function rules($id = null)
     {
         return [
-            /**
-             * Rule syntax:
-             * 'column' => 'validation1|validation2'
-             *
-             * or
-             *
-             * 'column' => ['validation1', function1()]
-             */
-            // 'prefixname' => 'string.required',
+
             'prefixname' => [UserPrefixnameEnum::getValuesAsInRule()],
-            'firstname' => 'string|required',
-            'middlename' => 'string',
-            'lastname' => 'string|required',
-            'suffixname' => 'string',
-            'username' => 'string|required|unique:users,'.$id,
+            'firstname' => 'string|required|max:255',
+            'middlename' => 'string|max:255',
+            'lastname' => 'string|required|max:255',
+            'suffixname' => 'string|max:255',
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique(User::class)->ignore($id),
+            ],
             'type' => [UserTypeEnum::getValuesAsInRule(), 'required'],
-            'email' => 'string|required|unique:users,email_address,'.$id,
-            'password' => 'required',
-            // 'photo' => '',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique(User::class)->ignore($id),
+            ],
+            'password' => $id ? '' : 'string|required|min:6',
+            'photo' => [
+                'nullable',
+                'image',
+                'max:2048', // Maximum file size in kilobytes
+            ],
         ];
     }
 
@@ -71,7 +84,6 @@ class UserService implements UserServiceInterface
      */
     public function list(): LengthAwarePaginator
     {
-        // dd($this->model->latest()->paginate(config('default.pagination.size')));
         return $this->model->latest()->paginate(config('default.pagination.size'));
     }
 
@@ -82,7 +94,22 @@ class UserService implements UserServiceInterface
      */
     public function store(array $attributes)
     {
-        // Code goes brrrr.
+        $user = new User;
+        $user->prefixname = $attributes['prefixname'] ?? null;
+        $user->firstname = $attributes['firstname'];
+        $user->middlename = $attributes['middlename'] ?? null;
+        $user->lastname = $attributes['lastname'];
+        $user->suffixname = $attributes['suffixname'] ?? null;
+        $user->username = $attributes['username'];
+        $user->email = $attributes['email'];
+        $user->password = $attributes['password'];
+        $user->type = $attributes['type'];
+
+        if ($this->request->hasFile('photo')) {
+            $user->photo = $this->upload($this->request->photo);
+        }
+
+        return $user->save();
     }
 
     /**
@@ -91,7 +118,7 @@ class UserService implements UserServiceInterface
      */
     public function find(int $id): ?Model
     {
-        return $this->model->find($id);
+        return $this->model->withTrashed()->find($id);
     }
 
     /**
@@ -99,7 +126,24 @@ class UserService implements UserServiceInterface
      */
     public function update(int $id, array $attributes): bool
     {
-        // Code goes brrrr.
+        $user = $this->find($id);
+        $user->prefixname = $attributes['prefixname'] ?? $user->prefixname;
+        $user->firstname = $attributes['firstname'] ?? $user->firstname;
+        $user->middlename = $attributes['middlename'] ?? $user->middlename;
+        $user->lastname = $attributes['lastname'] ?? $user->lastname;
+        $user->suffixname = $attributes['suffixname'] ?? $user->suffixname;
+        $user->username = $attributes['username'] ?? $user->username;
+        $user->email = $attributes['email'] ?? $user->email;
+        $user->type = $attributes['type'] ?? $user->type;
+        if (isset($attributes['password'])) {
+            $user->password = Hash::make($attributes['password']);
+        }
+        if ($this->request->hasFile('photo')) {
+            $user->photo = $this->upload($this->request->photo);
+        }
+        $user->save();
+
+        return true;
     }
 
     /**
@@ -110,7 +154,8 @@ class UserService implements UserServiceInterface
      */
     public function destroy($id)
     {
-        // Code goes brrrr.
+        $user = $this->find($id);
+        $user->delete();
     }
 
     /**
@@ -120,7 +165,7 @@ class UserService implements UserServiceInterface
      */
     public function listTrashed()
     {
-        // Code goes brrrr.
+        return $this->model->onlyTrashed()->latest()->paginate(config('default.pagination.size'));
     }
 
     /**
@@ -131,7 +176,8 @@ class UserService implements UserServiceInterface
      */
     public function restore($id)
     {
-        // Code goes brrrr.
+        $user = User::withTrashed()->find($id);
+        $user->restore();
     }
 
     /**
@@ -142,15 +188,8 @@ class UserService implements UserServiceInterface
      */
     public function delete($id)
     {
-        // Code goes brrrr.
-    }
-
-    /**
-     * Generate random hash key.
-     */
-    public function hash(string $key): string
-    {
-        // Code goes brrrr.
+        $user = User::withTrashed()->find($id);
+        $user->forceDelete();
     }
 
     /**
@@ -160,6 +199,25 @@ class UserService implements UserServiceInterface
      */
     public function upload(UploadedFile $file)
     {
-        // Code goes brrrr.
+        $coverImage = Storage::disk(config('filesystems.default'))->put(config('global.users_images'), $file);
+
+        return config('global.users_images').basename($coverImage);
+    }
+
+    public function handleSavingDetails(User $user)
+    {
+        $keys = DetailKeysEnum::getKeysValues($user);
+        $inputs = [];
+        foreach ($keys as $key => $value) {
+            $inputs[] = [
+                'key' => $key,
+                'value' => $value,
+                'status' => '1',
+                'type' => DetailTypeEnum::BIO->value,
+                'user_id' => $user->id,
+            ];
+        }
+
+        return Detail::insert($inputs);
     }
 }
