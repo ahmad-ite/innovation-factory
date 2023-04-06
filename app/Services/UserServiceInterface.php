@@ -11,15 +11,13 @@ interface UserServiceInterface
      *
      * @return string
      */
-
-
     public function list();
 
     public function store(array $attributes);
 
     public function find(int $id): ?Model;
 
-    public function update(int $id, array $attributes): bool;
+    public function update(int $id, array $attributes);
 
     public function destroy($id);
 

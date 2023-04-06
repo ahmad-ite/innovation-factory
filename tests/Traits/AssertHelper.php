@@ -14,4 +14,17 @@ trait AssertHelper
         $this->assertEquals($expected['next_page_url'], $paginator['next_page_url']);
         $this->assertEquals($expected['data'], $paginator['data']);
     }
+
+    public function assertUser($paginator, $expected)
+    {
+        $this->assertEquals($expected['prefixname'], $paginator['prefixname']);
+        $this->assertEquals($expected['email'], $paginator['email']);
+        $this->assertEquals($expected['firstname'], $paginator['firstname']);
+        $this->assertEquals($expected['middlename'], $paginator['middlename']);
+        $this->assertEquals($expected['lastname'], $paginator['lastname']);
+        $this->assertEquals($expected['suffixname'], $paginator['suffixname']);
+        $this->assertEquals($expected['username'], $paginator['username']);
+        $this->assertEquals($expected['type'], $paginator['type']);
+
+    }
 }

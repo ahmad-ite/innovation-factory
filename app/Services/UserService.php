@@ -62,7 +62,7 @@ class UserService implements UserServiceInterface
                 'max:255',
                 Rule::unique(User::class)->ignore($id),
             ],
-            'type' => [UserTypeEnum::getValuesAsInRule(), 'required'],
+            'type' => [UserTypeEnum::getValuesAsInRule(), $id ? '' : 'required'],
             'email' => [
                 'required',
                 'string',
@@ -109,7 +109,9 @@ class UserService implements UserServiceInterface
             $user->photo = $this->upload($this->request->photo);
         }
 
-        return $user->save();
+        $user->save();
+
+        return $user;
     }
 
     /**
@@ -122,9 +124,9 @@ class UserService implements UserServiceInterface
     }
 
     /**
-     * Update model resource.
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    public function update(int $id, array $attributes): bool
+    public function update(int $id, array $attributes)
     {
         $user = $this->find($id);
         $user->prefixname = $attributes['prefixname'] ?? $user->prefixname;
@@ -143,7 +145,7 @@ class UserService implements UserServiceInterface
         }
         $user->save();
 
-        return true;
+        return $user;
     }
 
     /**

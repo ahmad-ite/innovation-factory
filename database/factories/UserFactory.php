@@ -27,7 +27,6 @@ class UserFactory extends Factory
             'lastname' => fake()->lastName(),
             'suffixname' => null,
             'username' => fake()->unique()->userName(),
-            // 'photo' => null,
             'type' => UserTypeEnum::getRandomValue(),
             'email_verified_at' => now(),
             'password' => config('default.admin.password'), // password
